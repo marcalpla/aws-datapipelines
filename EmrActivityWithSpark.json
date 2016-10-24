@@ -1,0 +1,76 @@
+{
+  "objects": [
+    {
+      "name": "EmrActivityObj",
+      "step": "#{myEmrStep}",
+      "runsOn": {
+        "ref": "EmrClusterObj"
+      },
+      "id": "EmrActivityObj",
+      "type": "EmrActivity"
+    },
+    {
+      "name": "EmrClusterObj",
+      "coreInstanceType": "#{myCoreInstanceType}",
+      "keyPair": "#{myEc2KeyPair}",
+      "coreInstanceCount": "#{myCoreInstanceCount}",
+      "masterInstanceType": "#{myMasterInstanceType}",
+      "releaseLabel": "#{myEmrReleaseLabel}",
+      "applications": "#{myApplications}",
+      "id": "EmrClusterObj",
+      "type": "EmrCluster",
+      "terminateAfter": "50 Minutes",
+      "configuration": {
+        "ref": "spark"
+      }
+    },
+    {
+      "name": "spark",
+      "id": "spark",
+      "type": "EmrConfiguration",
+      "classification": "spark",
+      "property": {
+        "ref": "maximizeResourceAllocation"
+      }
+    },
+    {
+      "name": "maximizeResourceAllocation",
+      "id": "maximizeResourceAllocation",
+      "type": "Property",
+      "key": "maximizeResourceAllocation",
+      "value": "true"
+    },
+    {
+      "failureAndRerunMode": "CASCADE",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "scheduleType": "cron",
+      "schedule": {
+        "ref": "SchedulePeriod"
+      },
+      "name": "Default",
+      "pipelineLogUri":"s3://pipelineLogUri",
+      "id": "Default"
+    },
+    {
+      "id": "SchedulePeriod",
+      "name": "SchedulePeriod",
+      "period": "1 Day",
+      "startDateTime": "2016-10-20T00:10:00",
+      "type": "Schedule"
+     }
+  ],
+  "values": {
+    "myMasterInstanceType": "m1.medium",
+    "myEmrReleaseLabel": "emr-5.0.0",
+    "myApplications": "spark",
+    "myEc2KeyPair": "myEc2KeyPair",
+    "myCoreInstanceCount": "2",
+    "myCoreInstanceType": "m1.medium",
+    "myEmrStep": "command-runner.jar,spark-submit,--deploy-mode,cluster,--master,yarn-cluster,--class,#{myEmrStepClassName},#{myEmrStepJarFile},#{myEmrStepParam1},#{myEmrStepParam2}",
+    "myEmrStepClassName": "complete.class.name",
+    "myEmrStepJarFile": "s3://myEmrStepJarFile.jar",
+    "myEmrStepParam1": "myEmrStepParam1",
+    "myEmrStepParam2": "myEmrStepParam2"
+  }
+}
